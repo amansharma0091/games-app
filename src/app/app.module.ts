@@ -6,23 +6,30 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-
+import { LoginComponent } from './login.component';
+import { HomeComponent } from './home.component';
 import { GameService } from './game.service';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { AuthenticationService } from './authentication.service';
+
+import { AuthGuard } from './auth-guard';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+      AppComponent, LoginComponent, HomeComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
       HttpModule,
-      PaginationModule.forRoot()
-      
+      PaginationModule.forRoot(),
+      TypeaheadModule.forRoot(),
+      AppRoutingModule
   ],
-  providers: [ GameService ],
-  bootstrap: [AppComponent]
+    providers: [ AuthGuard,AuthenticationService, GameService ],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }

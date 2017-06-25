@@ -9,40 +9,55 @@ import 'rxjs/Rx';
 
 import { Game } from './game';
 
+import { AuthenticationService } from './authentication.service';
 
 @Injectable()
 export class GameService {
 
-  private options: RequestOptions;
- 
+    private options: RequestOptions;
 
-  constructor(private http: Http)  {
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/json');
-    this.options = new RequestOptions({ headers: headers });
-  }
+    private baseUrl = "http://localhost:8080/api/";
+    private token: string;
 
-  public getAllGames(): Observable<Game[]> {
-    const url = 'http://localhost:8080/api/findall';
-    return this.http.get(url)
-      .map(resp => {
-        return resp.json();
-      })
-      .catch(this.handleError);
-  }
-
-
-  private handleError(error: Response | any) {
-    // In production use logging infrastructure
-    let errMsg: string;
-    if (error instanceof Response) {
-      const body = error.json() || '';
-      const err = body.error || JSON.stringify(body);
-      errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
-    } else {
-      errMsg = error.message ? error.message : error.toString();
+    constructor(private http: Http, private authService : AuthenticationService) {
+        this.getHeaders();
     }
-    console.error(errMsg);
-    return Observable.throw(errMsg);
-  }
+    private getHeaders(): void {
+        let headers = new Headers({ 'Authorization': this.authService.token });
+        headers.set('Content-Type', 'application/json');
+        this.options = new RequestOptions({ headers: headers,withCredentials:true });
+    }
+   
+    public getAllGames(): Observable<Game[]> {
+        const url = this.baseUrl + 'findall';
+        return this.http.get(url, this.options)
+            .map(resp => {
+                return resp.json();
+            })
+            .catch(this.handleError);
+    }
+
+    public find(text: string): Observable<Game[]> {
+        const url = this.baseUrl + '/find?title=' + text;
+        return this.http.get(url, this.options)
+            .map(resp => {
+                return resp.json();
+            })
+            .catch(this.handleError);
+    }
+
+
+    private handleError(error: Response | any) {
+        // In production use logging infrastructure
+        let errMsg: string;
+        if (error instanceof Response) {
+            const body = error.json() || '';
+            const err = body.error || JSON.stringify(body);
+            errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
+        } else {
+            errMsg = error.message ? error.message : error.toString();
+        }
+        console.error(errMsg);
+        return Observable.throw(errMsg);
+    }
 }
