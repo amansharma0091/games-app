@@ -122,7 +122,7 @@ export class HomeComponent implements OnInit {
         this.games = tempGames;
     }
 
-    public typeAheadOnSelect(event: any) {
+    public typeaheadOnSelect(event: any) {
 
     }
 }

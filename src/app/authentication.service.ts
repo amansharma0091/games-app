@@ -19,7 +19,7 @@ export class AuthenticationService {
         headers.set('Content-Type', 'application/json');
         let options = new RequestOptions({ headers: headers });
 
-        return this.http.post('http://localhost:8080/api/auth', JSON.stringify({ username: "username"
+        return this.http.post('https://games-api-dev.herokuapp.com/api/auth', JSON.stringify({ username: "username"
                                                                                  , password: "password" }),
                             options)
             .map((response: Response) => {

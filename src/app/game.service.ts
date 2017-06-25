@@ -16,7 +16,7 @@ export class GameService {
 
     private options: RequestOptions;
 
-    private baseUrl = "http://localhost:8080/api/";
+    private baseUrl = "https://games-api-dev.herokuapp.com/api/";
     private token: string;
 
     constructor(private http: Http, private authService : AuthenticationService) {
