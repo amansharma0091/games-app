@@ -1,41 +1,46 @@
 
 import { Injectable } from '@angular/core';
-import { Http, Headers, Response, RequestOptions } from '@angular/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class AuthenticationService {
     public token: string;
+    baseUrl = 'https://games-api-dev.herokuapp.com/api/auth';
 
-    constructor(private http: Http) {
+    constructor(private httpClient: HttpClient) {
         this.login();
         var currentUser = JSON.parse(localStorage.getItem('currentUser'));
         this.token = currentUser && currentUser.token;
     }
 
     login(): Observable<boolean> {
-         let headers = new Headers();
-        headers.set('Content-Type', 'application/json');
-        let options = new RequestOptions({ headers: headers });
+        let headers = new HttpHeaders({'Content-Type': 'application/json'});
 
-        return this.http.post('https://games-api-dev.herokuapp.com/api/auth', JSON.stringify({ username: "username"
-                                                                                 , password: "password" }),
-                            options)
-            .map((response: Response) => {
-                let token = response.json() && response.json().token;
-                if (token) {
-                    this.token = token;
-                    localStorage.setItem('currentUser', JSON.stringify({ username: "username", token:token }));
-                    return true;
-                } else {
-                    return false;
-                }
-            });
+        return this.httpClient.post(this.baseUrl, JSON.stringify({ username: "username", password: "password" }),
+        { headers : headers, observe: 'response', responseType: 'json'})
+        .map((response : HttpResponse<any>)=>{
+            //let token = response.json() && response.json().token;
+            let token = response.body.token;
+            console.log("rsponse :+"+JSON.stringify(response))
+            if (token) {
+                this.token = token;
+                localStorage.setItem('currentUser', JSON.stringify({ username: "username", token:token }));
+                return true;
+            } else {
+                return false;
+            }
+        });
+
     }
 
     logout(): void {
         this.token = null;
         localStorage.removeItem('currentUser');
+    }
+
+    getToken(): string{
+        return this.token;
     }
 }

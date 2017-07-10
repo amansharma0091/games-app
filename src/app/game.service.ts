@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Headers, RequestOptions } from '@angular/http';
-
+import { Response } from '@angular/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
@@ -14,41 +13,30 @@ import { AuthenticationService } from './authentication.service';
 @Injectable()
 export class GameService {
 
-    private options: RequestOptions;
+    private options: any
 
-    private baseUrl = "https://games-api-dev.herokuapp.com/api/";
+    private baseUrl = "https://games-api-dev.herokuapp.com/api";
     private token: string;
 
-    constructor(private http: Http, private authService : AuthenticationService) {
+    constructor(private http: HttpClient) {
         this.getHeaders();
     }
+
     private getHeaders(): void {
-        let headers = new Headers({ 'Authorization': this.authService.token });
-        headers.set('Content-Type', 'application/json');
-        this.options = new RequestOptions({ headers: headers,withCredentials:true });
+        let headers = new HttpHeaders({ 'Content-Type': 'application/json'});
+        this.options = { headers: headers, observe:'body', responseType: 'json', withCredentials:true };
     }
    
-    public getAllGames(): Observable<Game[]> {
-        const url = this.baseUrl + 'findall';
-        return this.http.get(url, this.options)
-            .map(resp => {
-                return resp.json();
-            })
-            .catch(this.handleError);
+    public getAllGames(): Observable<any> {
+        return this.http.get(`${this.baseUrl}/findall`, this.options)
     }
 
-    public find(text: string): Observable<Game[]> {
-        const url = this.baseUrl + '/find?title=' + text;
-        return this.http.get(url, this.options)
-            .map(resp => {
-                return resp.json();
-            })
-            .catch(this.handleError);
+    public find(text: string): Observable<any> {
+        return this.http.get(`${this.baseUrl}/find?title=${text}`, this.options) 
     }
 
 
     private handleError(error: Response | any) {
-        // In production use logging infrastructure
         let errMsg: string;
         if (error instanceof Response) {
             const body = error.json() || '';

@@ -63,8 +63,6 @@ export class HomeComponent implements OnInit {
     }
 
     public pageChanged(event: any): void {
-        console.log('Page changed to: ' + event.page);
-        console.log('Number items per page: ' + event.itemsPerPage);
         this.currentPage = event.page - 1;
         this.setCurrentPage();
     }
